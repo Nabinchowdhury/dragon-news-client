@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 const NewsCard = ({ news }) => {
     const { _id, details, image_url, title, author, rating, total_view } = news
-    console.log(news)
+    // console.log(news)
     return (
         <div>
             <Card className="mb-3">
