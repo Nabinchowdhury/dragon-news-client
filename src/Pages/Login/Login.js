@@ -1,13 +1,16 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthProvider/AuthProvider';
 
 
 const Login = () => {
     const { logUserIn } = useContext(AuthContext)
+    const [error, setError] = useState("")
     const navigate = useNavigate()
+    const location = useLocation()
+    const from = location.state?.from?.pathname || "/"
     const handleSubmit = (e) => {
         e.preventDefault()
         const form = e.target
@@ -18,8 +21,12 @@ const Login = () => {
             .then(user => {
                 console.log("log in successfull", email)
                 form.reset()
-                navigate('/')
-            }).catch(error => console.error(error))
+                navigate(from, { replace: true })
+                setError("")
+            }).catch(error => {
+                console.error(error)
+                setError(error.message)
+            })
     }
     return (
         <div>
@@ -33,12 +40,12 @@ const Login = () => {
                     <Form.Control type="password" name='password' placeholder="Password" required />
                 </Form.Group>
 
-                <p>Don't have an account? <Link to="/register">Sign up </Link> </p>
+                <p>Don't have an account? <Link to="/register" state={{ from: from }} replace>Sign up </Link> </p>
                 <Button variant="primary" type="submit">
                     Log in
                 </Button>
-                <Form.Text className="ms-3">
-                    We'll never share your email with anyone else.
+                <Form.Text className="ms-3 text-danger fw-bold">
+                    {error}
                 </Form.Text>
             </Form>
         </div>
