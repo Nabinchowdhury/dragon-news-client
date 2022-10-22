@@ -1,18 +1,19 @@
 import React, { useContext, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthProvider/AuthProvider';
 
 
 
 const Regiser = () => {
-    const { createNewUser, updateUserProfile } = useContext(AuthContext)
+    const { createNewUser, updateUserProfile, verifyUser } = useContext(AuthContext)
     const [error, setError] = useState("")
     const [checked, setChecked] = useState(false)
     const navigate = useNavigate()
     const location = useLocation()
-    const from = location.state?.from || "/"
+    // const from = location.state?.from || "/"
     const handleSubmit = (e) => {
         e.preventDefault()
         const form = e.target
@@ -26,12 +27,14 @@ const Regiser = () => {
         }
 
         createNewUser(email, password)
-            .then(user => {
-                console.log("log in successfull", email)
+            .then(result => {
+                const user = result.user
+                console.log("log in successfull", user)
                 form.reset()
-                navigate(from, { replace: true })
+                // navigate(from, { replace: true })
                 setError("")
                 handleUpdateUser(profile)
+                handleUserVerification()
             }).catch(error => {
                 console.error(error)
                 setError(error.message)
@@ -45,6 +48,13 @@ const Regiser = () => {
         updateUserProfile(profile)
             .then(() => { })
             .catch(error => console.error(error))
+    }
+
+    const handleUserVerification = () => {
+        verifyUser()
+            .then(() => {
+                toast.success('A verification email has sent. Check spam folder if not found in inbox')
+            }).catch(error => console.error("Error", error))
     }
 
     return (
